@@ -1,4 +1,4 @@
-name: parser_from_url
+name: mini.parser
 dependencies:
   http: any
   html: any
