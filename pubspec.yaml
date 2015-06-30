@@ -1,0 +1,4 @@
+name: parser_from_url
+dependencies:
+  http: any
+  html: any
