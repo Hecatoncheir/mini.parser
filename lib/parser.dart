@@ -1,14 +1,23 @@
 library mini.parser;
 
+import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
-class MiniParser {
+abstract class Parser {
+  getContentFrom(String uri, {List selectors});
+  getContentFromTag();
+}
+
+class MiniParser implements Parser {
   getContentFrom(String uri, {List selectors}) async {
     var htmlForParse, content, html;
 
-    htmlForParse = await http.read(uri);
-    html = parse(htmlForParse);
+    Map headers = {'Content-type':'text/html', 'charset':'windows-1251'};
+
+    htmlForParse = await http.read(uri, headers: headers);
+
+    html = parse(htmlForParse, encoding:'utf-8');
     content = new Map();
 
     selectFor(String selector){
@@ -25,8 +34,6 @@ class MiniParser {
     }
 
     selectors.forEach(selectFor);
-
-    //content = html.querySelector(selectors).text;
 
     return content;
 
