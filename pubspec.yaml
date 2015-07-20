@@ -1,4 +1,8 @@
 name: mini.parser
+version: 0.0.2
+description: Parser for web-pages
+author: <Vostrikov Vitaliy> <rasart.pro@gmail.com>
+homepage: https://github.com/Rasarts/mini.parser
 dependencies:
   http: any
   html: any
