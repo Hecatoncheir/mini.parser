@@ -4,27 +4,33 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:html/parser.dart' show parse;
 
+part 'cp1251.dart';
+
 abstract class Parser {
   getContentFrom(String uri, {List selectors});
-  getContentFromTag();
+  // getContentFromTag();
 }
 
 class MiniParser implements Parser {
-  getContentFrom(String uri, {List selectors}) async {
-    var htmlForParse, content, html;
+  getContentFrom(String uri, {List selectors, bool cp1251:false}) async {
+    var htmlForParse, content, html, bytes;
 
-    Map headers = {'Content-type':'text/html', 'charset':'windows-1251'};
+    bytes = await http.readBytes(uri);
 
-    htmlForParse = await http.read(uri, headers: headers);
+    if(cp1251){
+      htmlForParse = decodeCp1251(bytes);
+    } else {
+      htmlForParse = UTF8.decode(bytes);
+    }
 
-    html = parse(htmlForParse, encoding:'utf-8');
+    html = parse(htmlForParse);
     content = new Map();
 
-    selectFor(String selector){
+    selectFor(String selector) {
       var contentListFromSelector;
       List nodes = new List();
 
-      makeMapContent(node){
+      makeMapContent(node) {
         nodes.add(node.text);
         content[selector] = nodes;
       }
@@ -36,6 +42,5 @@ class MiniParser implements Parser {
     selectors.forEach(selectFor);
 
     return content;
-
   }
 }
