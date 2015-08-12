@@ -8,10 +8,11 @@ part 'cp1251.dart';
 
 abstract class Parser {
   getContentFrom(String uri, {List selectors});
-  // getContentFromTag();
+  getContentFromTagsAttributes(String uri,{List selectors, List attributes});
 }
 
 class MiniParser implements Parser {
+
   getContentFrom(String uri, {List selectors, bool cp1251:false}) async {
     var htmlForParse, content, html, bytes;
 
@@ -43,4 +44,44 @@ class MiniParser implements Parser {
 
     return content;
   }
+
+  getContentFromTagsAttributes(String uri,{List selectors, List attributes}) async {
+
+    var bytes, htmlForParse, html, content;
+
+    bytes = await http.readBytes(uri);
+    htmlForParse = UTF8.decode(bytes);
+    html = parse(htmlForParse);
+    content = new Map();
+
+    selectFor(String selector) {
+      List contentListFromSelector;
+      List nodes = new List();
+
+      //int selectorIndex = selectors.indexOf(selector);
+      
+      makeMapContent(node) {
+      List selectorResult = new List();
+
+        attributes.forEach((selector){
+          selectorResult.add(node.attributes[selector]);
+        });
+
+        nodes.add(selectorResult);
+        //nodes.add(node.attributes['${attributes[selectorIndex]}']);
+        content[selector] = nodes;
+      }
+
+
+      contentListFromSelector = html.querySelectorAll(selector);
+      contentListFromSelector.forEach(makeMapContent);
+
+      content[selector] = nodes;
+    }
+
+    selectors.forEach(selectFor);
+
+    return content;
+  }
+
 }
